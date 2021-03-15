@@ -1,6 +1,6 @@
 #!/bin/sh
 time conda install -q -y -c conda-forge rdkit
-python3 conda_path.py
+#python3 conda_path.py
 pip install -U torch torchvision
 pip install git+https://github.com/facebookresearch/fvcore.git
 pip install absl-py==0.10.0
