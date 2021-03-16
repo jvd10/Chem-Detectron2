@@ -60,5 +60,6 @@ pip install Werkzeug==1.0.1
 pip install yacs==0.1.8
 pip install zipp==3.3.0
 pip install ipykernel
-git clone https://github.com/facebookresearch/detectron2 detectron2_repo
-pip install -e detectron2_repo
+#https://detectron2.readthedocs.io/en/latest/tutorials/install.html
+python -m pip install detectron2 -f \
+https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.8/index.html
