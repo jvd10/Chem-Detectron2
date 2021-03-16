@@ -3,14 +3,17 @@
 Main approach uses a RCNN type model to directly predict individual atom and bond locations, and constructs molecules from those.
 
 
-## Installation
+## Installation & Setup
 
 This is setup on Ubuntu 18.04 + torch 1.7.1 + cuda 11.0
 
-Use the following to install all dependencies:
+1. Use the following to install all dependencies:
 ```bash
 bash setup.sh
 ```
+2. Create Folders:
+    - Create a images/ folder inside data/
+    - Create train/ and dev/ folders inside images/ folder
 
 ## Usage
 
