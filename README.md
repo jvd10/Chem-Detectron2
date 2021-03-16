@@ -5,13 +5,11 @@ Main approach uses a RCNN type model to directly predict individual atom and bon
 
 ## Installation
 
-Note: Miniconda3 must be installed to install RDkit. 
-The code runs on linux (tested on Ubuntu 16.04).
-Code tested on cuda10.1+pytorch1.6.
+This is setup on Ubuntu 18.04 + torch 1.7.1 + cuda 11.0
+
+Use the following to install all dependencies:
 ```bash
-pip install requirements.txt
-pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.6/index.html
-conda install -c conda-forge rdkit=2020.03.1 
+bash setup.sh
 ```
 
 ## Usage
