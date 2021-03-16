@@ -3,7 +3,7 @@ import trainer
 
 if __name__ == '__main__':
     # run flags
-    train_new_model = False                    # NOTE: if false, previous model is restored
+    train_new_model = True                    # NOTE: if false, previous model is restored
     test_data_path = '/data/images/test_hard'
     model_name = 'Resnet101_FPN_3x_' + test_data_path.split("/")[-1]
     checkpoint_name = 'model_final.pth'
