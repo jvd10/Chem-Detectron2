@@ -12,7 +12,7 @@ This is setup on Ubuntu 18.04 + torch 1.7.1 + cuda 11.0
 bash setup.sh
 ```
 2. Create Folders:
-    - Create a images/ folder inside data/
+    - Create a images/ folder inside data/ folder
     - Create train/ and dev/ folders inside images/ folder
 
 ## Usage
