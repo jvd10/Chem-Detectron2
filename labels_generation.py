@@ -331,7 +331,8 @@ def create_COCO_json(smiles, file_name, mode, labels, base_path='.'):
     """
     if not os.path.exists(base_path + f'/data/images/{mode}/{file_name}'):
         mol = Chem.MolFromSmiles(smiles)
-        Chem.Draw.MolToImageFile(mol, base_path + f'/data/images/{mode}/{file_name}')
+       # print(mol)
+        Chem.Draw.MolToFile(mol, base_path + f'/data/images/{mode}/{file_name}')
 
     return {'file_name':   base_path + f'/data/images/{mode}/{file_name}',
             'height':      300,

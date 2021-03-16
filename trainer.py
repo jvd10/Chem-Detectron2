@@ -67,15 +67,19 @@ class Trainer:
         self.idx_to_labels = {v: k for k, v in self.unique_labels.items()}
         for l, b in zip(self.bond_labels, ['SINGLE', 'DOUBLE', 'TRIPLE']):
             self.idx_to_labels[l] = b
-
+        
+        #print(DatasetCatalog.list())
         # preparing datasets for training
         for mode in ["train", "val"]:
             dataset_name = f"smilesdetect_{mode}"
             if dataset_name in DatasetCatalog.list():
                 DatasetCatalog.remove(dataset_name)
+                
             DatasetCatalog.register(dataset_name, lambda mode=mode: self.get_metadata(mode))
+            #DatasetCatalog.register(dataset_name, lambda _: self.get_metadata(mode))
             MetadataCatalog.get(dataset_name).set(thing_classes=self.labels)
         self.smiles_metadata = MetadataCatalog.get("smilesdetect_val")
+        #print(DatasetCatalog.list())
 
         self.cfg = self.create_cfg()
         self.predictor = None
@@ -111,13 +115,14 @@ class Trainer:
                                                                     counts,
                                                                     unique_atoms_per_molecule,
                                                                     datapoints_per_label=self.n_sample_per_label)
-
+            # print(f'train_balanced size is {train_balanced.size}')
+            # print(f'val_balanced size is {val_balanced.size}')
             # sample hard cases
             sampled_train = sample_images(get_mol_sample_weight(self.data, base_path=self.base_path),
                                           n=self.n_sample_hard, )
             sampled_val = sample_images(get_mol_sample_weight(self.data, base_path=self.base_path),
-                                        n=self.n_sample_hard // 100),
-
+                                        n=self.n_sample_hard // 100, )
+            
             # create splits with sampled data
             self.data.set_index('file_name', inplace=True)
             data_train = self.data.loc[sampled_train].reset_index()
@@ -126,7 +131,13 @@ class Trainer:
             # concatenate both datasets
             data_train = pd.concat([data_train, train_balanced])
             data_val = pd.concat([data_val, val_balanced]).drop_duplicates()
-
+            # print(data_train.iloc[0])
+            # print(data_train.iloc[234])
+            # print(data_val.iloc[2])
+            # print(data_val.iloc[1000])
+            # print(f'data_train.size is {data_train.size}')
+            # print(f'data_val.size is {data_val.size}')
+            
             # create COCO annotations
             for data_split, mode in zip([data_train, data_val], ['train', 'val']):
                 if os.path.exists(self.base_path + f'/data/annotations_{mode}.pkl'):
@@ -134,7 +145,7 @@ class Trainer:
                     continue
                 params = [[row.SMILES,
                            row.file_name,
-                           'train',
+                           mode, #'train',
                            unique_labels,
                            self.base_path] for _, row in data_split.iterrows()]
                 result = pqdm(params,
@@ -191,6 +202,7 @@ class Trainer:
         self.cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = train_params['ROI_batch_per_image']
         self.cfg.TEST.EVAL_PERIOD = train_params['evaluation_interval']
         self.cfg.DATALOADER.NUM_WORKERS = train_params['num_workers']
+        #print(DatasetCatalog.list())
         trainer = CocoTrainer(self.cfg)
         trainer.resume_or_load(resume=True)
         trainer.train()
