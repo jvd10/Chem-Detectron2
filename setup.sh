@@ -1,9 +1,5 @@
 #!/bin/sh
 time conda install -q -y -c conda-forge rdkit
-conda remove torch torchvision
-pip uninstall torch
-pip uninstall torch
-pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 #python3 conda_path.py
 pip install -U torch torchvision
 pip install git+https://github.com/facebookresearch/fvcore.git
@@ -64,6 +60,9 @@ pip install Werkzeug==1.0.1
 pip install yacs==0.1.8
 pip install zipp==3.3.0
 pip install ipykernel
+pip uninstall torch
+pip uninstall torch
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 # https://detectron2.readthedocs.io/en/latest/tutorials/install.html
 # check the above link, the following is for cuda == 11.1, torch == 1.8
 python -m pip install detectron2 -f \
