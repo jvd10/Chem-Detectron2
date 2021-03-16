@@ -1,5 +1,6 @@
 #!/bin/sh
 time conda install -q -y -c conda-forge rdkit
+conda install pytorch=1.7.1 -c pytorch
 #python3 conda_path.py
 pip install -U torch torchvision
 pip install git+https://github.com/facebookresearch/fvcore.git
@@ -63,4 +64,4 @@ pip install ipykernel
 # https://detectron2.readthedocs.io/en/latest/tutorials/install.html
 # check the above link, the following is for cuda == 11.1, torch == 1.8
 python -m pip install detectron2 -f \
-  https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.8/index.html
+  https://dl.fbaipublicfiles.com/detectron2/wheels/cu110/torch1.7/index.html
