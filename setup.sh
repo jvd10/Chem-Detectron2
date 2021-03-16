@@ -1,5 +1,8 @@
 #!/bin/sh
 time conda install -q -y -c conda-forge rdkit
+conda remove torch torchvision
+pip uninstall torch
+pip uninstall torch
 pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 #python3 conda_path.py
 pip install -U torch torchvision
