@@ -1,5 +1,5 @@
 #!/bin/sh
-time conda install -q -y -c conda-forge rdkit
+time conda install -q -y -c conda-forge rdkit=2020.03.1 
 #python3 conda_path.py
 pip install -U torch torchvision
 pip install git+https://github.com/facebookresearch/fvcore.git
