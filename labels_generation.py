@@ -256,8 +256,10 @@ def get_bbox(smiles, unique_labels, atom_margin=12, bond_margin=10):
             _margin *= 1.5
 
         # creating bbox coordinates as XYWH.
-        begin_atom_idx = min(int(path.getAttribute('begin-atom-idx')) - 1, len(atoms_data) - 1)
-        end_atom_idx = min(int(path.getAttribute('end-atom-idx')) - 1, len(atoms_data) - 1)
+        #begin_atom_idx = min(int(path.getAttribute('begin-atom-idx')) - 1, len(atoms_data) - 1)
+        #end_atom_idx = min(int(path.getAttribute('end-atom-idx')) - 1, len(atoms_data) - 1)
+        begin_atom_idx = int(path.getAttribute('begin-atom-idx')) - 1
+        end_atom_idx = int(path.getAttribute('end-atom-idx')) - 1
         x = min(atoms_data[begin_atom_idx]['x'], atoms_data[end_atom_idx]['x']) - _margin // 2  # left-most pos
         y = min(atoms_data[begin_atom_idx]['y'], atoms_data[end_atom_idx]['y']) - _margin // 2  # up-most pos
         width = abs(atoms_data[begin_atom_idx]['x'] - atoms_data[end_atom_idx]['x']) + _margin
