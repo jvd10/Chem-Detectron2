@@ -61,7 +61,10 @@ pip install Werkzeug==1.0.1
 pip install yacs==0.1.8
 pip install zipp==3.3.0
 pip install ipykernel
+pip uninstall torch
+pip uninstall torch
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 # https://detectron2.readthedocs.io/en/latest/tutorials/install.html
-# check the above link, the following is for cuda == 11.1, torch == 1.8
+# check the above link, the following is for cuda == 11.1, torch == 1.7.1
 python -m pip install detectron2 -f \
   https://dl.fbaipublicfiles.com/detectron2/wheels/cu110/torch1.7/index.html
