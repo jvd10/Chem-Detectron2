@@ -4,7 +4,7 @@ import trainer
 if __name__ == '__main__':
     # run flags
     train_new_model = False                    # NOTE: if false, previous model is restored
-    test_data_path = '/data/images/test_hard'
+    test_data_path = '/data/images/test'
     model_name = 'Resnet101_FPN_3x_' + test_data_path.split("/")[-1]
     checkpoint_name = 'model_final.pth'
     predictions_path = './predictions'

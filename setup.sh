@@ -1,8 +1,8 @@
 #!/bin/sh
-time conda install -q -y -c conda-forge rdkit
-pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+time conda install -q -y -c conda-forge rdkit=2020.03.1 
+#pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 #python3 conda_path.py
-pip install -U torch torchvision
+pip install -U torch==1.6.0 torchvision==0.7.0
 pip install git+https://github.com/facebookresearch/fvcore.git
 pip install absl-py==0.10.0
 pip install bounded-pool-executor==0.0.3

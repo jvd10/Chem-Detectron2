@@ -1,1 +1,4 @@
 .pynb_checkpoints/
+data/
+predictions/
+trained_models/

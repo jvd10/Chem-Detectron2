@@ -280,7 +280,7 @@ class Trainer:
         outputs = []
         for i in tqdm(range(0, len(images_paths), batch_size)):
             # input format for the model list[{"image"}: ...,], image: Tensor, image in (C, H, W) format.
-            imgs = [cv2.imread(path)[:, :, ::-1] for path in images_paths[i:i + batch_size]]
+            imgs = [cv2.resize(cv2.imread(path), (300,300))[:, :, ::-1] for path in images_paths[i:i + batch_size]]
 
             with torch.no_grad():
                 # predict batch, move to cpu and add to outputs.
