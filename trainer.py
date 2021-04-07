@@ -51,8 +51,9 @@ class Trainer:
         self.n_sample_per_label = params['n_sample_per_label']
         self.input_format = params['input_format']
 
-        assert os.path.exists(self.base_path + '/data/train.csv'), f"No train CSV file in data folder."
-        self.data = pd.read_csv('./data/train.csv')
+        train_file = self.base_path + params['train_path']
+        assert os.path.exists(train_file), f"No train CSV file in data folder."
+        self.data = pd.read_csv(train_file)
 
         self.preprocess()
 
@@ -63,7 +64,8 @@ class Trainer:
         self.labels.insert(0, self.labels.pop())  # need "other" first in the list
 
         # idx to labels for inference
-        self.bond_labels = [self.unique_labels[b] for b in ['-', '=', '#']]
+        #self.bond_labels = [self.unique_labels[b] for b in ['-', '=', '#']]
+        self.bond_labels = [self.unique_labels[b] for b in ['-', '=', '#', '.', '$', ':', '/', '\\']]
         self.idx_to_labels = {v: k for k, v in self.unique_labels.items()}
         for l, b in zip(self.bond_labels, ['SINGLE', 'DOUBLE', 'TRIPLE']):
             self.idx_to_labels[l] = b
@@ -103,7 +105,9 @@ class Trainer:
                                                                          base_path=self.base_path)
 
             # bonds SMARTS
-            unique_bonds = ['-', '=', '#']
+            #unique_bonds = ['-', '=', '#']
+            #. - = # $ : / \
+            unique_bonds = ['-', '=', '#', '.', '$', ':', '/', '\\']
 
             # Choose labels depending on a minimum count.
             counts = {k: v for k, v in counts.items() if v > self.min_points_threshold}
@@ -115,6 +119,7 @@ class Trainer:
                                                                     counts,
                                                                     unique_atoms_per_molecule,
                                                                     datapoints_per_label=self.n_sample_per_label)
+
             # print(f'train_balanced size is {train_balanced.size}')
             # print(f'val_balanced size is {val_balanced.size}')
             # sample hard cases
@@ -175,16 +180,20 @@ class Trainer:
         :return:
         """
         cfg = get_cfg()
+        # cfg.merge_from_file(model_zoo.get_config_file(
+        #         "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"))
         cfg.merge_from_file(model_zoo.get_config_file(
-                "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"))
+                "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
         # Passing the Train and Validation sets
         cfg.DATASETS.TRAIN = ("smilesdetect_train",)
         cfg.DATASETS.TEST = ("smilesdetect_val",)
         cfg.OUTPUT_DIR = self.base_path + '/trained_models'
         cfg.INPUT.FORMAT = self.input_format
         # Number of data loading threads
+        # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
+        #         "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml")
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-                "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml")
+                "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.unique_labels)
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
         return cfg
@@ -343,6 +352,40 @@ class CocoTrainer(DefaultTrainer):
             output_folder = "coco_eval"
 
         return COCOEvaluator(dataset_name, cfg, False, output_folder)
+    
+    @classmethod
+    def build_train_loader(cls, cfg):
+        transform_list = [
+            T.RandomContrast(intensity_min=0.3, intensity_max=0.7),
+            T.RandomBrightness(intensity_min=0.2, intensity_max=0.9),
+            T.RandomFlip(prob=0.5, horizontal=False, vertical=True),
+            T.RandomFlip(prob=0.5, horizontal=True, vertical=False), 
+            T.RandomSaturation(intensity_min=0.3, intensity_max=1.7),
+            T.RandomRotation(angle=[-180.0,180.0], expand=True, center=None, sample_style='range', interp=None)            
+        ]
+        mapper = DatasetMapper(cfg, is_train=True, augmentations=transform_list)
+        return build_detection_train_loader(cfg, mapper=mapper)
+
+# def custom_mapper(dataset_dict):
+#     # Implement a mapper, similar to the default DatasetMapper, but with your own customizations
+    
+#     dataset_dict = copy.deepcopy(dataset_dict)  # it will be modified by code below
+#     image = utils.read_image(dataset_dict["file_name"], format="BGR")
+#     transform_list = [T.Resize((800,800)),
+#                       T.RandomFlip(prob=0.5, horizontal=False, vertical=True),
+#                       T.RandomFlip(prob=0.5, horizontal=True, vertical=False), 
+#                       ]
+#     image, transforms = T.apply_transform_gens(transform_list, image)
+#     dataset_dict["image"] = torch.as_tensor(image.transpose(2, 0, 1).astype("float32"))
+
+#     annos = [
+#         utils.transform_instance_annotations(obj, transforms, image.shape[:2])
+#         for obj in dataset_dict.pop("annotations")
+#         if obj.get("iscrowd", 0) == 0
+#     ]
+#     instances = utils.annotations_to_instances(annos, image.shape[:2])
+#     dataset_dict["instances"] = utils.filter_empty_instances(instances)
+#     return dataset_dict
 
 
 class CustomBatchPredictor:
