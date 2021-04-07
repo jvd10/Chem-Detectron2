@@ -11,13 +11,15 @@ if __name__ == '__main__':
     device = 'cuda'
 
     # general parameters
+    # './data/train.csv'
     params = {'base_path':            '.',     # NOTE: base path of the environment.
-              'min_points_threshold': 500,     # NOTE: Minimum number of instances of an atom
-              'n_sample_hard':        200000,  # to be considered as a label. Atoms with
-              'n_sample_per_label':   20000,   # less than this value are considered "other".
+              'min_points_threshold': 1,     # NOTE: Minimum number of instances of an atom to be considered as a label. Atoms with less than this value are considered "other".
+              'n_sample_hard':        1000000, 
+              'n_sample_per_label':   20000,   # NOTE: applies to both train and validation sets.
               'overwrite':            False,   # NOTE: determines if we overwrite existing data.
               'input_format':         "RGB",   # NOTE: Important to set depending on data format!
-              'n_jobs':               multiprocessing.cpu_count() - 1}
+              'n_jobs':               multiprocessing.cpu_count() - 1,
+              'train_path':            '/data/pubchem_smiles.csv'}
     # train parameters
     train_params = {'images_per_batch':         6,
                     'learning_rate':            0.005,
