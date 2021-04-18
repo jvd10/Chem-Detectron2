@@ -52,7 +52,7 @@ class Trainer:
         self.input_format = params['input_format']
 
         train_file = self.base_path + params['train_path']
-        assert os.path.exists(train_file), f"No train CSV file in data folder."
+        assert os.path.exists(train_file), f"No train CSV file {train_file} in data folder."
         self.data = pd.read_csv(train_file)
 
         self.preprocess()
@@ -94,7 +94,7 @@ class Trainer:
         the data folder, they are created automatically.
         :return:
         """
-        assert os.path.exists(self.base_path + '/data/train.csv'), f"No train CSV file in data folder."
+        #assert os.path.exists(self.base_path + '/data/train.csv'), f"No train CSV file in data folder."
 
         if not all([os.path.exists(self.base_path + f'/data/annotations_{mode}.pkl') for mode in ['train', 'val']]):
             print(f"{color.BLUE}Creating COCO-style annotations for both sampled datasets [train, val]{color.BLUE}")
