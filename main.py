@@ -19,7 +19,7 @@ if __name__ == '__main__':
               'overwrite':            False,   # NOTE: determines if we overwrite existing data.
               'input_format':         "RGB",   # NOTE: Important to set depending on data format!
               'n_jobs':               multiprocessing.cpu_count() - 1,
-              'train_path':            '/data/pubchem_smiles.csv'}
+              'train_path':            'drive/MyDrive/pubchem_smiles_2000000.csv'}
     # train parameters
     train_params = {'images_per_batch':         6,
                     'learning_rate':            0.005,
