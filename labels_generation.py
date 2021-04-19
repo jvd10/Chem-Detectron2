@@ -12,6 +12,7 @@ from scipy.spatial.ckdtree import cKDTree
 
 from utils import *
 
+counter = 0
 
 def _get_unique_atom_smiles_and_rarity(smiles):
     """ HELPER FUNCTION - DONT CALL DIRECTLY
@@ -21,10 +22,18 @@ def _get_unique_atom_smiles_and_rarity(smiles):
     :param smiles: SMILES. (string)
     :return: set of atom smiles(strings).
     """
+    a, b = get_helper(smiles)
+    if a and b:
+      return a, b
+    else:
+      counter += 1
+      print(f'{color.BLUE}There were {counter} invalid smiles.{color.END}')
+      newa, newb = get_helper('Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OC(=O)c2cccc(O)c2O)C(O)C1O')
+      return newa, newb
 
+def get_helper(smiles):
     mol = Chem.MolFromSmiles(smiles)
     assert mol, f'INVALID SMILES STRING: {smiles}'
-
     doc = _get_svg_doc(mol)
 
     # get atom positions in order to oversample hard cases
@@ -103,7 +112,6 @@ def create_unique_ins_labels(data, overwrite=False, base_path='.'):
     assert type(smiles_list) == list, 'Input smiles data type must be a LIST'
 
     n_jobs = multiprocessing.cpu_count() - 1
-
     # get unique atom-smiles in each compound and count for sampling later.
     result = pqdm(smiles_list, _get_unique_atom_smiles_and_rarity,
                   n_jobs=n_jobs, desc='Calculating unique atom-smiles and rarity')
