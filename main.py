@@ -12,14 +12,14 @@ if __name__ == '__main__':
 
     # general parameters
     # './data/train.csv'
-    params = {'base_path':            '.',     # NOTE: base path of the environment.
+    params = {'base_path':            '/content/LG_SMILES_1st',     # NOTE: base path of the environment.
               'min_points_threshold': 1,     # NOTE: Minimum number of instances of an atom to be considered as a label. Atoms with less than this value are considered "other".
               'n_sample_hard':        2000000, 
               'n_sample_per_label':   50000,   # NOTE: applies to both train and validation sets.
               'overwrite':            False,   # NOTE: determines if we overwrite existing data.
               'input_format':         "RGB",   # NOTE: Important to set depending on data format!
               'n_jobs':               multiprocessing.cpu_count() - 1,
-              'train_path':            'drive/MyDrive/pubchem_smiles_2000000.csv'}
+              'train_path':            'data/pubchem_smiles_2000000.csv'}
     # train parameters
     train_params = {'images_per_batch':         6,
                     'learning_rate':            0.005,
