@@ -103,9 +103,22 @@ def create_unique_ins_labels(data, overwrite=False, base_path='.'):
 
     n_jobs = multiprocessing.cpu_count() - 1
     # get unique atom-smiles in each compound and count for sampling later.
-    result = pqdm(smiles_list, _get_unique_atom_smiles_and_rarity,
+    result = pqdm(smiles_list[:3000], _get_unique_atom_smiles_and_rarity,
                   n_jobs=n_jobs, desc='Calculating unique atom-smiles and rarity')
-    result, sample_weights = list(map(list, zip(*result)))
+    # for a in result[2770:2775]:
+    #   iter(a)
+    #   print("===")
+    #   print(a)
+    filtered_result = []
+    for r in result:
+      try:
+        iter(r)
+        filtered_result.append(r)
+      except:
+        continue
+    #print(len(filtered_result))
+    #result, sample_weights = list(map(list, zip(*result)))
+    result, sample_weights = list(map(list, zip(*filtered_result)))
     counts = Counter(x for xs in result for x in xs)
 
     # save counts
