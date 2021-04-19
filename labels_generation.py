@@ -109,15 +109,15 @@ def create_unique_ins_labels(data, overwrite=False, base_path='.'):
     #   iter(a)
     #   print("===")
     #   print(a)
-    filtered_result = []
-    for r in result:
-      try:
-        iter(r)
-        filtered_result.append(r)
-      except:
-        continue
+#     filtered_result = []
+#     for r in result:
+#       try:
+#         iter(r)
+#         filtered_result.append(r)
+#       except:
+#         continue
     #print(f'There are in total {len(filtered_result)} valid examples.')
-    assert len(filtered_result) == len(result), f'There are in total {len(filtered_result)} valid examples.'
+    #assert len(filtered_result) == len(result), f'There are in total {len(filtered_result)} valid examples.'
     result, sample_weights = list(map(list, zip(*result)))
     #result, sample_weights = list(map(list, zip(*filtered_result)))
     counts = Counter(x for xs in result for x in xs)
