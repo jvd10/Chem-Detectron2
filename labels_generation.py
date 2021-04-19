@@ -22,16 +22,6 @@ def _get_unique_atom_smiles_and_rarity(smiles):
     :param smiles: SMILES. (string)
     :return: set of atom smiles(strings).
     """
-    a, b = get_helper(smiles)
-    if a and b:
-      return a, b
-    else:
-      counter += 1
-      print(f'{color.BLUE}There were {counter} invalid smiles.{color.END}')
-      newa, newb = get_helper('Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OC(=O)c2cccc(O)c2O)C(O)C1O')
-      return newa, newb
-
-def get_helper(smiles):
     mol = Chem.MolFromSmiles(smiles)
     assert mol, f'INVALID SMILES STRING: {smiles}'
     doc = _get_svg_doc(mol)
