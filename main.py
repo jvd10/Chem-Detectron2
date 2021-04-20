@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     # general parameters
     # './data/train.csv'
-    params = {'base_path':            '/content/LG_SMILES_1st',     # NOTE: base path of the environment.
+    params = {'base_path':            '/ocean/projects/tra190016p/ylix/dacon',     # NOTE: base path of the environment.
               'min_points_threshold': 1,     # NOTE: Minimum number of instances of an atom to be considered as a label. Atoms with less than this value are considered "other".
               'n_sample_hard':        2000000, 
               'n_sample_per_label':   2000,   # NOTE: applies to both train and validation sets. Originally 20000
