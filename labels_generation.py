@@ -171,7 +171,7 @@ def sample_balanced_datasets(data, counts, unique_atoms_per_molecule, datapoints
         else:
             sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label,
                                                                                         replace=True)
-        sampled_val_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label // 100,
+        sampled_val_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label // 500,
                                                                                   replace=True)
 
         balanced_train_data = balanced_train_data.append(sampled_train_data)
