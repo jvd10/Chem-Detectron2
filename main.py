@@ -1,5 +1,6 @@
 import multiprocessing
 import trainer
+import sys
 
 if __name__ == '__main__':
     # run flags
@@ -46,3 +47,4 @@ if __name__ == '__main__':
 
 #     # saves predictions to
 #     results.to_csv(f'{predictions_path}/predictions_{model_name}.csv', index=False)
+    sys.exit()
