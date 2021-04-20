@@ -21,7 +21,7 @@ if __name__ == '__main__':
               'n_jobs':               multiprocessing.cpu_count() - 1,
               'train_path':            '/data/pubchem_smiles_2000000.csv'}
     # train parameters
-    train_params = {'images_per_batch':         6,
+    train_params = {'images_per_batch':         24,
                     'learning_rate':            0.005,
                     'maximum_iterations':       80000,
                     'checkpoint_save_interval': 10000,
