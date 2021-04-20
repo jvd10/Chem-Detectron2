@@ -13,7 +13,7 @@ bash setup.sh
 ```
 2. Create Folders:
     - Create a images/ folder inside data/ folder
-    - Create train/ and dev/ folders inside images/ folder
+    - Create train/ and val/ folders inside images/ folder
 
 ## Usage
 
