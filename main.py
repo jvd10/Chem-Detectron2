@@ -24,7 +24,7 @@ if __name__ == '__main__':
     train_params = {'images_per_batch':         6,
                     'learning_rate':            0.005,
                     'maximum_iterations':       80000,
-                    'checkpoint_save_interval': 500,
+                    'checkpoint_save_interval': 10000,
                     'ROI_batch_per_image':      256,
                     'evaluation_interval':      2000,
                     'num_workers':              8}
