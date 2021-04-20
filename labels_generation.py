@@ -190,7 +190,7 @@ def sample_images(mol_weights, n=10000):
     :param n: number of molecules to sample[int]
     :return: Sampled dataset. [Pandas DF]
     """
-    img_names_sampled = pd.DataFrame.sample(mol_weights, n=n, weights=mol_weights, replace=True)
+    img_names_sampled = pd.DataFrame.sample(mol_weights, n=n, weights=mol_weights, replace=False)
     return img_names_sampled.index.to_list()
 
 
