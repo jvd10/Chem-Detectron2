@@ -5,7 +5,7 @@ import detectron2.data.transforms as T
 import torch
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
-from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.data import DatasetCatalog, MetadataCatalog, DatasetMapper
 from detectron2.engine import DefaultTrainer
 from detectron2.evaluation import COCOEvaluator
 from detectron2.model_zoo import model_zoo
@@ -429,3 +429,4 @@ class CustomBatchPredictor:
                 inputs.append({"image": image, "height": height, "width": width})
             predictions = self.model(inputs)
             return predictions
+
