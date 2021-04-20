@@ -15,7 +15,7 @@ if __name__ == '__main__':
     params = {'base_path':            '/content/LG_SMILES_1st',     # NOTE: base path of the environment.
               'min_points_threshold': 1,     # NOTE: Minimum number of instances of an atom to be considered as a label. Atoms with less than this value are considered "other".
               'n_sample_hard':        2000000, 
-              'n_sample_per_label':   5000,   # NOTE: applies to both train and validation sets. Originally 20000
+              'n_sample_per_label':   2000,   # NOTE: applies to both train and validation sets. Originally 20000
               'overwrite':            False,   # NOTE: determines if we overwrite existing data.
               'input_format':         "RGB",   # NOTE: Important to set depending on data format!
               'n_jobs':               multiprocessing.cpu_count() - 1,
