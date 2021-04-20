@@ -126,13 +126,13 @@ class Trainer:
             mole_weights = get_mol_sample_weight(self.data, base_path=self.base_path)
 #             sampled_train = sample_images(mole_weights,
 #                                           n=self.n_sample_hard, )
-            sampled_train = self.data.index.to_list()
             sampled_val = sample_images(mole_weights,
                                         n=self.n_sample_hard // 100, )
             
             # create splits with sampled data
             self.data.set_index('file_name', inplace=True)
-            data_train = self.data.loc[sampled_train].reset_index()
+            #data_train = self.data.loc[sampled_train].reset_index()
+            data_train = self.data
             data_val = self.data.loc[sampled_val].reset_index()
 
             # concatenate both datasets
