@@ -123,9 +123,11 @@ class Trainer:
             # print(f'train_balanced size is {train_balanced.size}')
             # print(f'val_balanced size is {val_balanced.size}')
             # sample hard cases
-            sampled_train = sample_images(get_mol_sample_weight(self.data, base_path=self.base_path),
-                                          n=self.n_sample_hard, )
-            sampled_val = sample_images(get_mol_sample_weight(self.data, base_path=self.base_path),
+            mole_weights = get_mol_sample_weight(self.data, base_path=self.base_path)
+#             sampled_train = sample_images(mole_weights,
+#                                           n=self.n_sample_hard, )
+            sampled_train = self.data.index.to_list()
+            sampled_val = sample_images(mole_weights,
                                         n=self.n_sample_hard // 100, )
             
             # create splits with sampled data
