@@ -50,10 +50,10 @@ class Trainer:
         self.n_sample_hard = params['n_sample_hard']
         self.n_sample_per_label = params['n_sample_per_label']
         self.input_format = params['input_format']
-
-        train_file = self.base_path + params['train_path']
-        assert os.path.exists(train_file), f"No train CSV file {train_file} in data folder."
-        self.data = pd.read_csv(train_file)
+        self.val_size = params['val_size']
+        self.train_file = self.base_path + params['train_path']
+        assert os.path.exists(self.train_file), f"No train CSV file {train_file} in data folder."
+        self.data = pd.read_csv(self.train_file)
 
         self.preprocess()
 
@@ -115,28 +115,36 @@ class Trainer:
             unique_labels = {u: idx + 1 for idx, u in zip(range(len(labels)), labels)}
 
             # Sample uniform datasets among labels
-            train_balanced, val_balanced = sample_balanced_datasets(self.data,
-                                                                    counts,
-                                                                    unique_atoms_per_molecule,
-                                                                    datapoints_per_label=self.n_sample_per_label)
+            # train_balanced, val_balanced = sample_balanced_datasets(self.data,
+            #                                                         counts,
+            #                                                         unique_atoms_per_molecule,
+            #                                                         datapoints_per_label=self.n_sample_per_label)
+            val_balanced = sample_balanced_datasets(self.data,
+                                                    counts,
+                                                    unique_atoms_per_molecule,
+                                                    datapoints_per_label=self.n_sample_per_label)
 
             # print(f'train_balanced size is {train_balanced.size}')
             # print(f'val_balanced size is {val_balanced.size}')
             # sample hard cases
             mole_weights = get_mol_sample_weight(self.data, base_path=self.base_path)
-#             sampled_train = sample_images(mole_weights,
-#                                           n=self.n_sample_hard, )
+            # sampled_train = sample_images(mole_weights,
+            #                               n=self.n_sample_hard, )
             sampled_val = sample_images(mole_weights,
-                                        n=self.n_sample_hard // 100, )
+                                        n=self.val_size, )
+            # sampled_val = sample_images(mole_weights,
+            #                             n=self.n_sample_hard // 100, )
             
             # create splits with sampled data
-            self.data.set_index('file_name', inplace=True)
+            #self.data.set_index('file_name', inplace=True)
+            new_data = self.data.set_index('file_name', inplace=False)
             #data_train = self.data.loc[sampled_train].reset_index()
             data_train = self.data
-            data_val = self.data.loc[sampled_val].reset_index()
+            #data_val = self.data.loc[sampled_val].reset_index()
+            data_val = new_data.loc[sampled_val].reset_index()
 
             # concatenate both datasets
-            data_train = pd.concat([data_train, train_balanced])
+            #data_train = pd.concat([data_train, train_balanced])
             data_val = pd.concat([data_val, val_balanced]).drop_duplicates()
             # print(data_train.iloc[0])
             # print(data_train.iloc[234])
@@ -152,7 +160,7 @@ class Trainer:
                     continue
                 params = [[row.SMILES,
                            row.file_name,
-                           mode, #'train',
+                           'train',
                            unique_labels,
                            self.base_path] for _, row in data_split.iterrows()]
                 result = pqdm(params,
