@@ -21,11 +21,12 @@ if __name__ == '__main__':
               'input_format':         "RGB",   # NOTE: Important to set depending on data format!
               'n_jobs':               multiprocessing.cpu_count() - 1,
               'train_path':            '/data/pubchem_smiles_2000000.csv',
-              'val_size':            4000
+              'val_size':            4000,
+              'saved_model_path':    '/trained_models'
     }
     # train parameters
     train_params = {'images_per_batch':         12,
-                    'learning_rate':            0.005,
+                    'learning_rate':            0.001,
                     'maximum_iterations':       80000,
                     'checkpoint_save_interval': 10000,
                     'ROI_batch_per_image':      256,
@@ -37,9 +38,9 @@ if __name__ == '__main__':
     
     print("Pre-processing finished.")
 
-#     # train model
-#    if train_new_model:
-#     model.train(train_params=train_params)
+    # train model
+    if train_new_model:
+     model.train(train_params=train_params)
 
 #     # restore trained model
 #     model.load_model(checkpoint_name, device=device)
