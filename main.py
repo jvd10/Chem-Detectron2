@@ -4,7 +4,7 @@ import sys
 
 if __name__ == '__main__':
     # run flags
-    train_new_model = False                    # NOTE: if false, previous model is restored
+    train_new_model = True                    # NOTE: if false, previous model is restored
     test_data_path = '/data/images/test'
     model_name = 'Resnet101_FPN_3x_' + test_data_path.split("/")[-1]
     checkpoint_name = 'model_final.pth'
@@ -20,7 +20,9 @@ if __name__ == '__main__':
               'overwrite':            False,   # NOTE: determines if we overwrite existing data.
               'input_format':         "RGB",   # NOTE: Important to set depending on data format!
               'n_jobs':               multiprocessing.cpu_count() - 1,
-              'train_path':            '/data/pubchem_smiles_2000000.csv'}
+              'train_path':            '/data/pubchem_smiles_2000000.csv',
+              'val_size':            4000
+    }
     # train parameters
     train_params = {'images_per_batch':         12,
                     'learning_rate':            0.005,
@@ -36,8 +38,8 @@ if __name__ == '__main__':
     print("Pre-processing finished.")
 
 #     # train model
-#     if train_new_model:
-#         model.train(train_params=train_params)
+#    if train_new_model:
+#     model.train(train_params=train_params)
 
 #     # restore trained model
 #     model.load_model(checkpoint_name, device=device)
