@@ -157,7 +157,7 @@ def sample_balanced_datasets(data, counts, unique_atoms_per_molecule, datapoints
     data = pd.merge(data, unique_atoms_per_molecule, left_on='SMILES', right_on='SMILES')
 
     # create DF to save balanced train data
-    balanced_train_data = pd.DataFrame(data=None, columns=data.columns)
+    # balanced_train_data = pd.DataFrame(data=None, columns=data.columns)
     balanced_val_data = pd.DataFrame(data=None, columns=data.columns)
 
     # sample datapoints per unique label type and append to datasets
@@ -165,22 +165,23 @@ def sample_balanced_datasets(data, counts, unique_atoms_per_molecule, datapoints
 
     for k in counts.keys():
 
-        if k == 'N1':
-            sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(5 * datapoints_per_label,
-                                                                                        replace=True)
-        else:
-            sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label,
-                                                                                        replace=True)
-        sampled_val_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label // 1000,
+        # if k == 'N1':
+        #     sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(5 * datapoints_per_label,
+        #                                                                                 replace=True)
+        # else:
+        #     sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label,
+        #                                                                                 replace=True)
+        sampled_val_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label // 100,
                                                                                   replace=True)
 
-        balanced_train_data = balanced_train_data.append(sampled_train_data)
+        #balanced_train_data = balanced_train_data.append(sampled_train_data)
         balanced_val_data = balanced_val_data.append(sampled_val_data)
 
-    balanced_train_data.drop('unique_atoms', axis=1, inplace=True)
+    # balanced_train_data.drop('unique_atoms', axis=1, inplace=True)
     balanced_val_data.drop('unique_atoms', axis=1, inplace=True)
 
-    return balanced_train_data, balanced_val_data
+    # return balanced_train_data, balanced_val_data
+    return balanced_val_data
 
 
 def sample_images(mol_weights, n=10000):
@@ -190,7 +191,7 @@ def sample_images(mol_weights, n=10000):
     :param n: number of molecules to sample[int]
     :return: Sampled dataset. [Pandas DF]
     """
-    img_names_sampled = pd.DataFrame.sample(mol_weights, n=n, weights=mol_weights, replace=False)
+    img_names_sampled = pd.DataFrame.sample(mol_weights, n=n, weights=mol_weights, replace=True)
     return img_names_sampled.index.to_list()
 
 
@@ -347,6 +348,7 @@ def create_COCO_json(smiles, file_name, mode, labels, base_path='.'):
         mol = Chem.MolFromSmiles(smiles)
        # print(mol)
         Chem.Draw.MolToFile(mol, base_path + f'/data/images/{mode}/{file_name}')
+        #print(base_path + f'/data/images/{mode}/{file_name}')
 
     return {'file_name':   base_path + f'/data/images/{mode}/{file_name}',
             'height':      300,
