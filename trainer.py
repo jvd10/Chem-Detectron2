@@ -52,6 +52,7 @@ class Trainer:
         self.input_format = params['input_format']
         self.val_size = params['val_size']
         self.train_file = self.base_path + params['train_path']
+        self.saved_model_path = params['saved_model_path']
         assert os.path.exists(self.train_file), f"No train CSV file {train_file} in data folder."
         self.data = pd.read_csv(self.train_file)
 
@@ -197,7 +198,7 @@ class Trainer:
         # Passing the Train and Validation sets
         cfg.DATASETS.TRAIN = ("smilesdetect_train",)
         cfg.DATASETS.TEST = ("smilesdetect_val",)
-        cfg.OUTPUT_DIR = self.base_path + '/trained_models'
+        cfg.OUTPUT_DIR = self.base_path + self.saved_model_path
         cfg.INPUT.FORMAT = self.input_format
         # Number of data loading threads
         # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
@@ -237,7 +238,7 @@ class Trainer:
         :param device: 'cuda' or 'cpu'. [str]
         :return:
         """
-        assert os.path.exists(self.base_path + '/trained_models'), "'trained_models' folder do not exist in root folder"
+        assert os.path.exists(self.base_path + self.saved_model_path), f"{self.saved_model_path} folder do not exist in root folder"
         print(f"{color.BLUE}Loading model{color.END}")
         self.cfg.MODEL.WEIGHTS = os.path.join(self.cfg.OUTPUT_DIR, model_name)
         self.cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = NMS_THRESH
