@@ -2,14 +2,13 @@ import json
 import multiprocessing
 from collections import Counter, defaultdict
 from xml.dom import minidom
-
+import cv2
 import numpy as np
 import pandas as pd
 from detectron2.structures import BoxMode
 from pqdm.processes import pqdm
 from rdkit.Chem import Draw
 from scipy.spatial.ckdtree import cKDTree
-
 from utils import *
 
 counter = 0
@@ -157,7 +156,7 @@ def sample_balanced_datasets(data, counts, unique_atoms_per_molecule, datapoints
     data = pd.merge(data, unique_atoms_per_molecule, left_on='SMILES', right_on='SMILES')
 
     # create DF to save balanced train data
-    # balanced_train_data = pd.DataFrame(data=None, columns=data.columns)
+    balanced_train_data = pd.DataFrame(data=None, columns=data.columns)
     balanced_val_data = pd.DataFrame(data=None, columns=data.columns)
 
     # sample datapoints per unique label type and append to datasets
@@ -165,23 +164,23 @@ def sample_balanced_datasets(data, counts, unique_atoms_per_molecule, datapoints
 
     for k in counts.keys():
 
-        # if k == 'N1':
-        #     sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(5 * datapoints_per_label,
-        #                                                                                 replace=True)
-        # else:
-        #     sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label,
-        #                                                                                 replace=True)
+        if k == 'N1':
+            sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(5 * datapoints_per_label,
+                                                                                        replace=True)
+        else:
+            sampled_train_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label,
+                                                                                        replace=True)
         sampled_val_data = data[data.unique_atoms.apply(lambda x: k in x)].sample(datapoints_per_label // 100,
                                                                                   replace=True)
 
-        #balanced_train_data = balanced_train_data.append(sampled_train_data)
+        balanced_train_data = balanced_train_data.append(sampled_train_data)
         balanced_val_data = balanced_val_data.append(sampled_val_data)
 
-    # balanced_train_data.drop('unique_atoms', axis=1, inplace=True)
+    balanced_train_data.drop('unique_atoms', axis=1, inplace=True)
     balanced_val_data.drop('unique_atoms', axis=1, inplace=True)
 
-    # return balanced_train_data, balanced_val_data
-    return balanced_val_data
+    return balanced_train_data, balanced_val_data
+    #return balanced_val_data
 
 
 def sample_images(mol_weights, n=10000):
@@ -192,6 +191,7 @@ def sample_images(mol_weights, n=10000):
     :return: Sampled dataset. [Pandas DF]
     """
     img_names_sampled = pd.DataFrame.sample(mol_weights, n=n, weights=mol_weights, replace=True)
+    # img_names_sampled = pd.DataFrame.sample(mol_weights, n=n, weights=mol_weights, replace=False)
     return img_names_sampled.index.to_list()
 
 
@@ -331,8 +331,17 @@ def plot_bbox(smiles, labels):
     cv2.destroyAllWindows()
     return
 
+    
+def defaultDrawOptions():
+    '''This function returns an RDKit drawing options object with 
+    default drawing options.'''
+    
+    opts = Draw.DrawingOptions()
+    opts.elemDict = defaultdict(lambda: (0,0,0)) # all atoms are black
+    opts.selectColor = (1, 0, 0)
+    return opts    
 
-def create_COCO_json(smiles, file_name, mode, labels, base_path='.'):
+def create_COCO_json(smiles, file_name, mode, labels, base_path):
     """
     Create COCO style dataset. If there is not image for the smile
     it creates it.
@@ -347,7 +356,13 @@ def create_COCO_json(smiles, file_name, mode, labels, base_path='.'):
     if not os.path.exists(base_path + f'/data/images/{mode}/{file_name}'):
         mol = Chem.MolFromSmiles(smiles)
        # print(mol)
-        Chem.Draw.MolToFile(mol, base_path + f'/data/images/{mode}/{file_name}')
+        # options = defaultDrawOptions()
+        img_path = base_path + f'/data/images/{mode}/{file_name}'
+        Chem.Draw.MolToFile(mol, img_path)
+        originalImage = cv2.imread(img_path)
+        grayImage = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
+        (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)
+        cv2.imwrite(img_path, blackAndWhiteImage)
         #print(base_path + f'/data/images/{mode}/{file_name}')
 
     return {'file_name':   base_path + f'/data/images/{mode}/{file_name}',
