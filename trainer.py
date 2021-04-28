@@ -12,6 +12,7 @@ from detectron2.model_zoo import model_zoo
 from detectron2.modeling import build_model
 from detectron2.utils.visualizer import Visualizer
 from tqdm import tqdm
+from rdkit.Chem import Draw
 
 import inference as inference
 from labels_generation import *
@@ -46,6 +47,7 @@ class Trainer:
         self.base_path = params['base_path']
         self.min_points_threshold = params['min_points_threshold']
         self.n_jobs = params['n_jobs']
+        self.num_gpu = params['num_gpu']
         self.overwrite = params['overwrite']
         self.n_sample_hard = params['n_sample_hard']
         self.n_sample_per_label = params['n_sample_per_label']
@@ -89,6 +91,7 @@ class Trainer:
 
         self.inference_metadata = MetadataCatalog.get("smilesdetect_val")
 
+        
     def preprocess(self):
         """
         Creates COCO-style object annotations directly from a list of SMILES strings. If images are not
@@ -116,36 +119,36 @@ class Trainer:
             unique_labels = {u: idx + 1 for idx, u in zip(range(len(labels)), labels)}
 
             # Sample uniform datasets among labels
-            # train_balanced, val_balanced = sample_balanced_datasets(self.data,
-            #                                                         counts,
-            #                                                         unique_atoms_per_molecule,
-            #                                                         datapoints_per_label=self.n_sample_per_label)
-            val_balanced = sample_balanced_datasets(self.data,
-                                                    counts,
-                                                    unique_atoms_per_molecule,
-                                                    datapoints_per_label=self.n_sample_per_label)
+            train_balanced, val_balanced = sample_balanced_datasets(self.data,
+                                                                    counts,
+                                                                    unique_atoms_per_molecule,
+                                                                    datapoints_per_label=self.n_sample_per_label)
+            # val_balanced = sample_balanced_datasets(self.data,
+            #                                         counts,
+            #                                         unique_atoms_per_molecule,
+            #                                         datapoints_per_label=self.n_sample_per_label)
 
             # print(f'train_balanced size is {train_balanced.size}')
             # print(f'val_balanced size is {val_balanced.size}')
             # sample hard cases
             mole_weights = get_mol_sample_weight(self.data, base_path=self.base_path)
-            # sampled_train = sample_images(mole_weights,
-            #                               n=self.n_sample_hard, )
-            sampled_val = sample_images(mole_weights,
-                                        n=self.val_size, )
+            sampled_train = sample_images(mole_weights,
+                                          n=self.n_sample_hard, )
             # sampled_val = sample_images(mole_weights,
-            #                             n=self.n_sample_hard // 100, )
+            #                             n=self.val_size, )
+            sampled_val = sample_images(mole_weights,
+                                        n=self.n_sample_hard // 100, )
             
             # create splits with sampled data
-            #self.data.set_index('file_name', inplace=True)
-            new_data = self.data.set_index('file_name', inplace=False)
-            #data_train = self.data.loc[sampled_train].reset_index()
-            data_train = self.data
-            #data_val = self.data.loc[sampled_val].reset_index()
-            data_val = new_data.loc[sampled_val].reset_index()
+            self.data.set_index('file_name', inplace=True)
+            #new_data = self.data.set_index('file_name', inplace=False)
+            data_train = self.data.loc[sampled_train].reset_index()
+            #data_train = self.data
+            data_val = self.data.loc[sampled_val].reset_index()
+            #data_val = new_data.loc[sampled_val].reset_index()
 
             # concatenate both datasets
-            #data_train = pd.concat([data_train, train_balanced])
+            data_train = pd.concat([data_train, train_balanced])
             data_val = pd.concat([data_val, val_balanced]).drop_duplicates()
             # print(data_train.iloc[0])
             # print(data_train.iloc[234])
@@ -153,7 +156,7 @@ class Trainer:
             # print(data_val.iloc[1000])
             # print(f'data_train.size is {data_train.size}')
             # print(f'data_val.size is {data_val.size}')
-            
+            #options = self.defaultDrawOptions()
             # create COCO annotations
             for data_split, mode in zip([data_train, data_val], ['train', 'val']):
                 if os.path.exists(self.base_path + f'/data/annotations_{mode}.pkl'):
@@ -206,6 +209,7 @@ class Trainer:
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
                 "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.unique_labels)
+        cfg.NUM_GPUS = self.num_gpu
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
         return cfg
 
@@ -360,22 +364,22 @@ class CocoTrainer(DefaultTrainer):
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
         if output_folder is None:
             os.makedirs("coco_eval", exist_ok=True)
-            output_folder = "coco_eval"
+            output_folder = "coco_eval_model7"
 
         return COCOEvaluator(dataset_name, cfg, False, output_folder)
     
-    @classmethod
-    def build_train_loader(cls, cfg):
-        transform_list = [
-            T.RandomContrast(intensity_min=0.3, intensity_max=0.7),
-            T.RandomBrightness(intensity_min=0.2, intensity_max=0.9),
-            T.RandomFlip(prob=0.5, horizontal=False, vertical=True),
-            T.RandomFlip(prob=0.5, horizontal=True, vertical=False), 
-            T.RandomSaturation(intensity_min=0.3, intensity_max=1.7),
-            T.RandomRotation(angle=[-180.0,180.0], expand=True, center=None, sample_style='range', interp=None)            
-        ]
-        mapper = DatasetMapper(cfg, is_train=True, augmentations=transform_list)
-        return build_detection_train_loader(cfg, mapper=mapper)
+    # @classmethod
+    # def build_train_loader(cls, cfg):
+    #     transform_list = [
+    #         T.RandomContrast(intensity_min=0.3, intensity_max=0.7),
+    #         T.RandomBrightness(intensity_min=0.2, intensity_max=0.9),
+    #         T.RandomFlip(prob=0.5, horizontal=False, vertical=True),
+    #         T.RandomFlip(prob=0.5, horizontal=True, vertical=False), 
+    #         T.RandomSaturation(intensity_min=0.3, intensity_max=1.7),
+    #         T.RandomRotation(angle=[-180.0,180.0], expand=True, center=None, sample_style='range', interp=None)            
+    #     ]
+    #     mapper = DatasetMapper(cfg, is_train=True, augmentations=transform_list)
+    #     return build_detection_train_loader(cfg, mapper=mapper)
 
 # def custom_mapper(dataset_dict):
 #     # Implement a mapper, similar to the default DatasetMapper, but with your own customizations
