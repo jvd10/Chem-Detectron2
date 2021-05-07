@@ -17,8 +17,11 @@ from rdkit.Chem import Draw
 import inference as inference
 from labels_generation import *
 from utils import *
+import io
 
-
+#glob_counter = 0
+#glob_features = {}
+#glob_features = []
 class Trainer:
     """
     Main class of the project. Preprocess a list of SMILES and directly
@@ -302,22 +305,31 @@ class Trainer:
 
         print(f'{color.BLUE}Predicting bounding boxes - {len(images_paths) // batch_size} batches{color.END}')
         outputs = []
+        #global glob_counter
+        global glob_features
         for i in tqdm(range(0, len(images_paths), batch_size)):
             # input format for the model list[{"image"}: ...,], image: Tensor, image in (C, H, W) format.
             imgs = [cv2.resize(cv2.imread(path), (300,300))[:, :, ::-1] for path in images_paths[i:i + batch_size]]
 
             with torch.no_grad():
                 # predict batch, move to cpu and add to outputs.
-                outputs.extend([pred['instances'].to('cpu') for pred in self.predictor(imgs)])
+                #outputs.extend([pred['instances'].to('cpu') for pred in self.predictor(imgs)])
+                self.predictor(imgs)
+            #print(f'glob_counter is {glob_counter}.')
+        #assert len(glob_features.keys()) == 10000
+        assert len(glob_features) == 10000
+        #assert glob_counter == 9999
+        torch.save(glob_features, self.base_path + '/oscar_data/val_img_feats.pt')
+        
+        print("Finished predict_batch()")
+        # print(f'{color.BLUE}Generating molecular graphs from detected atoms and bonds{color.END}')
 
-        print(f'{color.BLUE}Generating molecular graphs from detected atoms and bonds{color.END}')
+        # res = []
+        # for i in tqdm(range(len(outputs))):
+        #     res.append(self.output_to_smiles(outputs[i]))
 
-        res = []
-        for i in tqdm(range(len(outputs))):
-            res.append(self.output_to_smiles(outputs[i]))
-
-        return pd.DataFrame({'file_name': [path.split('/')[-1].strip() for path in images_paths],
-                             'SMILES':    res})
+        # return pd.DataFrame({'file_name': [path.split('/')[-1].strip() for path in images_paths],
+        #                      'SMILES':    res})
 
     def show_bboxes(self, image_path, split_per_label_type=False, default_font_size=8):
         """
@@ -364,7 +376,7 @@ class CocoTrainer(DefaultTrainer):
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
         if output_folder is None:
             os.makedirs("coco_eval", exist_ok=True)
-            output_folder = "coco_eval_model7"
+            output_folder = "coco_eval"
 
         return COCOEvaluator(dataset_name, cfg, False, output_folder)
     
@@ -411,6 +423,7 @@ class CustomBatchPredictor:
     def __init__(self, cfg):
         self.cfg = cfg.clone()  # cfg can be modified by model
         self.model = build_model(self.cfg)
+        #print('self.cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE is {cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE}')
         self.model.eval()
         if len(cfg.DATASETS.TEST):
             self.metadata = MetadataCatalog.get(cfg.DATASETS.TEST[0])
@@ -424,13 +437,15 @@ class CustomBatchPredictor:
 
         self.input_format = cfg.INPUT.FORMAT
         assert self.input_format in ["RGB", "BGR"], self.input_format
+        
 
     def __call__(self, images_batch):
         """
         :param images_batch (np.ndarray): an image of shape (H, W, C) (in BGR order).
         :return: bbox predictions. list[(dict),...]:
         """
-
+        #self.model.roi_heads.box_head.register_forward_hook(print_box_features)
+        #self.model.roi_heads.box_predictor.register_forward_hook(print_box_features)
         with torch.no_grad():
             # Apply pre-processing to image.
             if self.input_format == "RGB":
@@ -444,4 +459,35 @@ class CustomBatchPredictor:
                 inputs.append({"image": image, "height": height, "width": width})
             predictions = self.model(inputs)
             return predictions
-
+    
+# def print_box_features(self, input, output):
+#     # print('Inside ' + self.__class__.__name__ + ' forward')
+#     # print('')
+#     # print('input: ', type(input))
+#     # print('input[0]: ', type(input[0]))
+#     # print('output: ', type(output))
+#     # print('')
+#     print('input size:', len(input[0]))
+#     # for i, o in enumerate(output):
+#     #     print(f'output[{i}] size:', len(o))
+#     #     if iter(o):
+#     #         for ii, oo in enumerate(output[i]):
+#     #             print(f'output[{i}][{ii}] size:', oo.shape)
+#     #print('output size:', output.data.size())
+#     # print('output norm:', output.data.norm())
+#     #print(f'BEFORE output shape is {output.shape}')
+#     #global glob_counter
+#     global glob_features
+#     we_out = output.reshape(output.shape[0] // 1000, -1, 1024).to("cpu")
+#     print(f'AFTER output shape is {we_out.shape}')
+#     #print(f"{output.shape[0]} examples in batch.")
+#     # for i in range(we_out.shape[0]):
+#     #     #torch.save(output[i], f'oscar_data/train_img_feats/feat_{glob_counter}.pt')
+#     #     assert we_out[i].shape[0] == 1000
+#     #     glob_features[len(glob_features.keys())] = we_out[i]
+#     #     #glob_counter = len(glob_features.keys())
+#     glob_features.append(we_out)
+#     print(len(glob_features))
+#     #print(len(glob_features.keys()))
+        
+    
