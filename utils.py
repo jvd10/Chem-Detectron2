@@ -149,3 +149,4 @@ def _plot_bbox_inside_atoms(cpos, points, chosen, margin, file_name):
              cpos[1][1] + margin)
     plt.show()
     return
+
