@@ -1,6 +1,6 @@
 # Detectron2 Chemical Graph Image Feature Extractor
 This repo is modified based on an AI competition top-performing model to exctract image features from chemical structure diagrams.
-It utilizes FAIR's Detectron2 model to train on the image recognition task. It can be used to generate SMILES strings but it does not perform well on complicated chemical structure. It is better used as a visual backbone to extract image features to feed into a transformer-based model to generate the final SMILES string predictions.
+It utilizes FAIR's Detectron2-FastRCNN model to train on the image recognition task. It can be used to generate SMILES strings but it does not perform well on complicated chemical structure. It is better used as a visual backbone to extract image features to feed into a transformer-based model to generate the final SMILES string predictions.
 
 ## DACON Smiles competition Code - PBRH
 
