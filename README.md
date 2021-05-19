@@ -19,8 +19,30 @@ bash setup.sh
     - Create a images/ folder inside data/ folder
     - Create train/ and val/ folders inside images/ folder
 
-## Usage
+## Trained Model
+There is a trained model that is stored under the trained_models/ folder ready for use. It is trained with the following hyperparameters/parameters:
+- 500,000 images of sizes 300 * 300
+- batch size 12
+- learning rate 0.005
+- iterations 50,000
+- ROIs per image 1024
 
+### How to Use the Repo for various tasks
+#### Train Chem-Detectron2 
+- **PubChem_SMILES.ipynb**: Use this notebook to generate a list of SMILES (sampled from PubChem database that is updated daily).
+- **main.py** : Run this file to generate image data from SMILES to train Chem-Detectron2 and run training and validation. (hyperparameters and filepaths can be changed in this file)
+To run, simply do:
+```python
+python main.py
+```
+
+#### Generate Image Features from Chem-Detectron2 (as inputs to Chem-OSCAR model)
+- **generate_images.py**: Run this file to generate images from SMILES (if the images do not exist already). (filepaths can be changed in this file)
+- **detectron2_extract.py**: Run this file to generate image features from images. (hyperparameters and filepaths can be changed in this file)
+
+
+### Comments on Usage from the original Repo
+#### Usage
 - **main.py** : Main entry to code, constructs trainer object to train model, and predicts smiles for images in test folder.
 - **trainer.py** : Trainer class, preprocesses data, and trains model.
 - **labels_generation.py** : Functions to preprocess data and generate annotations for RCNN.
