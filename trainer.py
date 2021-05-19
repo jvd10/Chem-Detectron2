@@ -76,7 +76,6 @@ class Trainer:
         for l, b in zip(self.bond_labels, ['SINGLE', 'DOUBLE', 'TRIPLE']):
             self.idx_to_labels[l] = b
         
-        #print(DatasetCatalog.list())
         # preparing datasets for training
         for mode in ["train", "val"]:
             dataset_name = f"smilesdetect_{mode}"
@@ -87,7 +86,6 @@ class Trainer:
             #DatasetCatalog.register(dataset_name, lambda _: self.get_metadata(mode))
             MetadataCatalog.get(dataset_name).set(thing_classes=self.labels)
         self.smiles_metadata = MetadataCatalog.get("smilesdetect_val")
-        #print(DatasetCatalog.list())
 
         self.cfg = self.create_cfg()
         self.predictor = None
@@ -126,13 +124,7 @@ class Trainer:
                                                                     counts,
                                                                     unique_atoms_per_molecule,
                                                                     datapoints_per_label=self.n_sample_per_label)
-            # val_balanced = sample_balanced_datasets(self.data,
-            #                                         counts,
-            #                                         unique_atoms_per_molecule,
-            #                                         datapoints_per_label=self.n_sample_per_label)
 
-            # print(f'train_balanced size is {train_balanced.size}')
-            # print(f'val_balanced size is {val_balanced.size}')
             # sample hard cases
             mole_weights = get_mol_sample_weight(self.data, base_path=self.base_path)
             sampled_train = sample_images(mole_weights,
@@ -153,13 +145,7 @@ class Trainer:
             # concatenate both datasets
             data_train = pd.concat([data_train, train_balanced])
             data_val = pd.concat([data_val, val_balanced]).drop_duplicates()
-            # print(data_train.iloc[0])
-            # print(data_train.iloc[234])
-            # print(data_val.iloc[2])
-            # print(data_val.iloc[1000])
-            # print(f'data_train.size is {data_train.size}')
-            # print(f'data_val.size is {data_val.size}')
-            #options = self.defaultDrawOptions()
+
             # create COCO annotations
             for data_split, mode in zip([data_train, data_val], ['train', 'val']):
                 if os.path.exists(self.base_path + f'/data/annotations_{mode}.pkl'):
@@ -197,8 +183,6 @@ class Trainer:
         :return:
         """
         cfg = get_cfg()
-        # cfg.merge_from_file(model_zoo.get_config_file(
-        #         "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"))
         cfg.merge_from_file(model_zoo.get_config_file(
                 "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
         # Passing the Train and Validation sets
@@ -207,8 +191,6 @@ class Trainer:
         cfg.OUTPUT_DIR = self.base_path + self.saved_model_path
         cfg.INPUT.FORMAT = self.input_format
         # Number of data loading threads
-        # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-        #         "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml")
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
                 "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.unique_labels)
@@ -379,41 +361,6 @@ class CocoTrainer(DefaultTrainer):
             output_folder = "coco_eval"
 
         return COCOEvaluator(dataset_name, cfg, False, output_folder)
-    
-    # @classmethod
-    # def build_train_loader(cls, cfg):
-    #     transform_list = [
-    #         T.RandomContrast(intensity_min=0.3, intensity_max=0.7),
-    #         T.RandomBrightness(intensity_min=0.2, intensity_max=0.9),
-    #         T.RandomFlip(prob=0.5, horizontal=False, vertical=True),
-    #         T.RandomFlip(prob=0.5, horizontal=True, vertical=False), 
-    #         T.RandomSaturation(intensity_min=0.3, intensity_max=1.7),
-    #         T.RandomRotation(angle=[-180.0,180.0], expand=True, center=None, sample_style='range', interp=None)            
-    #     ]
-    #     mapper = DatasetMapper(cfg, is_train=True, augmentations=transform_list)
-    #     return build_detection_train_loader(cfg, mapper=mapper)
-
-# def custom_mapper(dataset_dict):
-#     # Implement a mapper, similar to the default DatasetMapper, but with your own customizations
-    
-#     dataset_dict = copy.deepcopy(dataset_dict)  # it will be modified by code below
-#     image = utils.read_image(dataset_dict["file_name"], format="BGR")
-#     transform_list = [T.Resize((800,800)),
-#                       T.RandomFlip(prob=0.5, horizontal=False, vertical=True),
-#                       T.RandomFlip(prob=0.5, horizontal=True, vertical=False), 
-#                       ]
-#     image, transforms = T.apply_transform_gens(transform_list, image)
-#     dataset_dict["image"] = torch.as_tensor(image.transpose(2, 0, 1).astype("float32"))
-
-#     annos = [
-#         utils.transform_instance_annotations(obj, transforms, image.shape[:2])
-#         for obj in dataset_dict.pop("annotations")
-#         if obj.get("iscrowd", 0) == 0
-#     ]
-#     instances = utils.annotations_to_instances(annos, image.shape[:2])
-#     dataset_dict["instances"] = utils.filter_empty_instances(instances)
-#     return dataset_dict
-
 
 class CustomBatchPredictor:
     """
@@ -459,35 +406,6 @@ class CustomBatchPredictor:
                 inputs.append({"image": image, "height": height, "width": width})
             predictions = self.model(inputs)
             return predictions
-    
-# def print_box_features(self, input, output):
-#     # print('Inside ' + self.__class__.__name__ + ' forward')
-#     # print('')
-#     # print('input: ', type(input))
-#     # print('input[0]: ', type(input[0]))
-#     # print('output: ', type(output))
-#     # print('')
-#     print('input size:', len(input[0]))
-#     # for i, o in enumerate(output):
-#     #     print(f'output[{i}] size:', len(o))
-#     #     if iter(o):
-#     #         for ii, oo in enumerate(output[i]):
-#     #             print(f'output[{i}][{ii}] size:', oo.shape)
-#     #print('output size:', output.data.size())
-#     # print('output norm:', output.data.norm())
-#     #print(f'BEFORE output shape is {output.shape}')
-#     #global glob_counter
-#     global glob_features
-#     we_out = output.reshape(output.shape[0] // 1000, -1, 1024).to("cpu")
-#     print(f'AFTER output shape is {we_out.shape}')
-#     #print(f"{output.shape[0]} examples in batch.")
-#     # for i in range(we_out.shape[0]):
-#     #     #torch.save(output[i], f'oscar_data/train_img_feats/feat_{glob_counter}.pt')
-#     #     assert we_out[i].shape[0] == 1000
-#     #     glob_features[len(glob_features.keys())] = we_out[i]
-#     #     #glob_counter = len(glob_features.keys())
-#     glob_features.append(we_out)
-#     print(len(glob_features))
-#     #print(len(glob_features.keys()))
+
         
     
