@@ -40,8 +40,7 @@ def write_imgs(img_name, smiles, mode):
         cv2.imwrite(img_path, blackAndWhiteImage)
 
 if __name__ == '__main__':
-    base_path = '/ocean/projects/tra190016p/ylix/dacon_old/dacon'
-    #with open("data/pubchem_smiles_2000000.csv", 'r') as fr, open("oscar_data/train_img_smiles.json", 'w') as fw_train, open("oscar_data/val_img_smiles.json", 'w') as fw_val:
+    base_path = '/ocean/projects/tra190016p/ylix/dacon'
     with open("smiles_json_30000.json", 'r') as fr:
         #cr = csv.reader(fr)
         #next(cr)
@@ -58,14 +57,4 @@ if __name__ == '__main__':
             n_jobs=128,
             argument_type='args',
             desc=f'{color.BLUE}Creating SMILES and images for OSCAR.')
-        
-        #counter = 0
-        # for i, smiles in tqdm(enumerate(cr)):
-        #     if i >= 1980000:
-        #         idx = i
-        #         idx -= 1980000
-        #         smiles_json_val[str(idx)] = smiles
-        #     else:
-        #         smiles_json_train[str(i)] = smiles
-        # json.dump(smiles_json_train, fw_train)
-        # json.dump(smiles_json_val, fw_val)
+
