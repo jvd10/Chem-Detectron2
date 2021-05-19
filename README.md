@@ -27,7 +27,7 @@ There is a trained model that is stored under the trained_models/ folder ready f
 - iterations 50,000
 - ROIs per image 1024
 
-### How to Use the Repo for various tasks
+## How to Use the Repo for various tasks
 #### Train Chem-Detectron2 
 - **PubChem_SMILES.ipynb**: Use this notebook to generate a list of SMILES (sampled from PubChem database that is updated daily).
 - **main.py** : Run this file to generate image data from SMILES to train Chem-Detectron2 and run training and validation. (hyperparameters and filepaths can be changed in this file)
@@ -41,7 +41,7 @@ python main.py
 - **detectron2_extract.py**: Run this file to generate image features from images. (hyperparameters and filepaths can be changed in this file)
 
 
-### Comments on Usage from the original Repo
+## Comments on Usage from the original Repo
 #### Usage
 - **main.py** : Main entry to code, constructs trainer object to train model, and predicts smiles for images in test folder.
 - **trainer.py** : Trainer class, preprocesses data, and trains model.
