@@ -39,7 +39,11 @@ python main.py
 #### Generate Image Features from Chem-Detectron2 (as inputs to Chem-OSCAR model)
 - **generate_images.py**: Run this file to generate images from SMILES (if the images do not exist already). (filepaths can be changed in this file)
 - **detectron2_extract.py**: Run this file to generate image features from images. (hyperparameters and filepaths can be changed in this file)
-
+To run, simply do:
+```python
+python generate_images.py
+python detectron2_extract.py
+```
 
 ## Comments on Usage from the original Repo
 #### Usage
