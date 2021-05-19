@@ -21,6 +21,7 @@ from detectron2.modeling.roi_heads.fast_rcnn import FastRCNNOutputLayers, FastRC
 import pandas as pd
 import glob
 from tqdm import tqdm
+from os import path
 
 def process_feature_extraction(predictor, img, pred_thresh=0.5):#step 3
     '''
@@ -74,8 +75,9 @@ def process_feature_extraction(predictor, img, pred_thresh=0.5):#step 3
 if __name__ == '__main__':
     mode = 'train'
     batch_size = 80
-    images_path = f'/oscar_images/{mode}'
-    features_file_path = f'/oscar_data/{mode}_img_feats.pt'
+    # images_path = f'/oscar_images/{mode}'
+    images_path = f'/patent1'
+    features_file_path = f'/patent1_img_feats.pt'
     NUM_OBJECTS = 50
     base_path = '/ocean/projects/tra190016p/ylix/dacon_old/dacon'
     saved_model_path = '/trained_models'
@@ -151,6 +153,7 @@ if __name__ == '__main__':
     print(f"Extracting features for {mode} dataset.")
 
     for image_name in tqdm(images_paths):
+        print(image_name)
         img = cv2.resize(cv2.imread(image_name), (300,300))[:, :, ::-1]
         img = torch.as_tensor(img.astype("float32").transpose(2, 0, 1))
         image_example = [{"image": img, "height": img.shape[0], "width": img.shape[1]}]
